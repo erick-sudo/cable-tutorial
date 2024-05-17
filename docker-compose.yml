@@ -1,0 +1,10 @@
+version: "3.8"
+
+services:
+  redis:
+    build:
+      context: redis
+      dockerfile: Dockerfile
+    container_name: redis_cable_tutorial
+    ports:
+      - "6379:6379"
