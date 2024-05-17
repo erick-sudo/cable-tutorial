@@ -1,13 +1,14 @@
 class ApplicationController < ActionController::API
 
-    wrap_parameters format: []
     include ActionController::Cookies
+
+    wrap_parameters format: []
 
     rescue_from ActiveRecord::RecordNotFound, with: :record_not_found_response
     rescue_from ActiveRecord::RecordInvalid, with: :unprocessable_entity_response
 
-    # before_action :authenticate
-    # skip_before_action :authenticate, only: [:welcome]
+    before_action :authenticate
+    skip_before_action :authenticate, only: [:welcome]
 
     def welcome
         render json: { "message" => "Welcome to HIVE!" }
@@ -15,7 +16,7 @@ class ApplicationController < ActionController::API
 
     def authenticate
         unless logged_in?
-          render json: { error: "Unauthorized", message: "You must be logged in to access this resource" }, status: :unauthorized
+          render json: { error: "Unauthorized", message: "Unauthorized access" }, status: :unauthorized
         end
       end
       
@@ -32,7 +33,7 @@ class ApplicationController < ActionController::API
             decoded_token = decode_token(cookies.signed[:user_jwt])
             if decoded_token && !expired_token?(decoded_token)
                 user_id = decoded_token.first['user_id']
-                User.find_by(id: user_id)
+                User.find(user_id)
             end
         end
     end
@@ -40,9 +41,9 @@ class ApplicationController < ActionController::API
     def decode_token(token)
         secret_key = Rails.application.secrets.secret_key_base
         begin
-          JWT.decode(token, secret_key).first
+          JWT.decode(token, secret_key, true, { algorithm: 'HS512' })
         rescue JWT::DecodeError
-          nil
+            nil
         end
     end
 
@@ -63,7 +64,7 @@ class ApplicationController < ActionController::API
     private
 
     def expired_token?(decoded_token)
-        Time.at(decoded_token.first['exp']) < Time.now
+        Time.at(decoded_token.last['exp']) < Time.now
       end
 
     def record_not_found_response
