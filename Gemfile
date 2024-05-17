@@ -31,3 +31,7 @@ end
 gem "active_model_serializers", "~> 0.10.14"
 
 gem "redis", "~> 5.2"
+
+gem "jwt", "~> 2.8"
+
+gem "bcrypt", "~> 3.1"

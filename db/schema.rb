@@ -21,10 +21,23 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_16_213611) do
     t.string "text"
     t.boolean "viewed", default: false
     t.integer "conversation_id", null: false
+    t.integer "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["conversation_id"], name: "index_messages_on_conversation_id"
+    t.index ["user_id"], name: "index_messages_on_user_id"
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.string "username"
+    t.string "name"
+    t.string "email"
+    t.string "phone"
+    t.string "password_digest"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   add_foreign_key "messages", "conversations"
+  add_foreign_key "messages", "users"
 end
