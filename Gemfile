@@ -35,3 +35,5 @@ gem "redis", "~> 5.2"
 gem "jwt", "~> 2.8"
 
 gem "bcrypt", "~> 3.1"
+
+gem "sidekiq", "~> 7.2"

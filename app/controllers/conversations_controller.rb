@@ -1,17 +1,21 @@
 class ConversationsController < ApplicationController
     def index
-        render json: Conversation.all
+        render json: Conversation.order(updated_at: :desc)
     end
 
     def create
-        conversation = Conversation.new(conversation_params)
-        if conversation.save
-            serialized_data = ActiveModelSerializers::Adapter::Json.new(
+        # Create a conversation
+        conversation = Conversation.create!(conversation_params)
+
+        # # Delegate deliver to a background job
+        # DeliverConversationJob.perform_later(conversation)
+
+        serialized_data = ActiveModelSerializers::Adapter::Json.new(
                 ConversationSerializer.new(conversation)
             ).serializable_hash
-            ActionCable.server.broadcast 'conversations_channel', serialized_data
-            head :ok
-        end
+        ActionCable.server.broadcast 'conversations_channel', serialized_data
+
+        head :ok
     end
 
     private
