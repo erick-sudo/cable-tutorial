@@ -8,7 +8,7 @@ class LoginController < ApplicationController
       token = encode_token(user_id: user.id)
       cookies.signed[:user_jwt] = { value: token, httponly: true, expires: 1.hour }
 
-      render json: { message: "Login successful" }, status: :ok
+      render json: { message: "Login successful", access_token: token }, status: :ok
     else
       render json: { error: "Invalid username or password" }, status: :unauthorized
     end

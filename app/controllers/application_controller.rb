@@ -29,8 +29,9 @@ class ApplicationController < ActionController::API
     end
       
     def find_user_by_token
-        if cookies.signed[:user_jwt]
-            decoded_token = decode_token(cookies.signed[:user_jwt])
+        token = cookies.signed[:user_jwt] || request.headers['Authorization']&.split(' ')&.last
+        if token
+            decoded_token = decode_token(token)
             if decoded_token && !expired_token?(decoded_token)
                 user_id = decoded_token.first['user_id']
                 User.find(user_id)
